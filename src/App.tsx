@@ -33,7 +33,11 @@ const App: React.FC = () => {
   };
 
   const handleFetchedTasks = (fetchedTasks: Task[]) => {
-    const combinedTasks = [...taskInput, ...fetchedTasks];
+    const existingTaskIds = new Set(taskInput.map((task) => task.id));
+    const newTasks = fetchedTasks.filter(
+      (task) => !existingTaskIds.has(task.id)
+    );
+    const combinedTasks = [...taskInput, ...newTasks];
     setTaskInput(combinedTasks);
   };
 
@@ -48,14 +52,30 @@ const App: React.FC = () => {
     }
   });
 
+  const getCurrentDate = () => {
+    const date = new Date();
+    return date.toLocaleDateString("en-GB").split("/").join(".");
+  };
+
   return (
-    <div className="App min-h-screen flex flex-col justify-center items-center bg-gray-100">
-      <span className="text-3xl font-bold mt-8 mb-4"> Task Management App</span>
-      <div className="w-full max-w-xl bg-white rounded-lg shadow-md p-6">
-        <InputTask tasks={tasks} setTasks={setTasks} addTask={addTask} />
-        <FilterTask taskFilter={taskFilter} setTaskFilter={setTaskFilter} />
-        <LoadTask handleFetchedTasks={handleFetchedTasks} />
+    <div className="App min-h-screen flex flex-col justify-center items-center">
+      <div className="w-full max-w-md bg-gray-100 rounded-lg shadow-md p-6">
+        <h1 className="text-2xl font-bold mb-4">Today's Tasks</h1>
+        <div className="flex mb-4">
+          <InputTask tasks={tasks} setTasks={setTasks} />
+          <button
+            onClick={addTask}
+            className="bg-gray-400 text-white px-4 mx- 4 rounded-r-md hover:bg-gray-600 transition duration-200"
+          >
+            Add
+          </button>
+        </div>
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-gray-700">{getCurrentDate()}</span>
+          <FilterTask taskFilter={taskFilter} setTaskFilter={setTaskFilter} />
+        </div>
         <TaskList taskInput={filteredTasks} setTaskInput={setTaskInput} />
+        <LoadTask handleFetchedTasks={handleFetchedTasks} />
       </div>
     </div>
   );

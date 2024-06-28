@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { Task } from "../model";
+import { Task, PreviousLoadedTask } from "../model";
 
 interface Props {
   handleFetchedTasks: (tasks: Task[]) => void;
@@ -17,10 +16,14 @@ const LoadTask: React.FC<Props> = ({ handleFetchedTasks }) => {
     setError(null);
 
     try {
-      const response = await axios.get(
+      const response = await fetch(
         "https://my-json-server.typicode.com/typicode/demo/posts"
       );
-      const fetchedTasks: Task[] = response.data.map((task: any) => ({
+      if (!response.ok) {
+        throw new Error("Tasks could not be loaded");
+      }
+      const data: PreviousLoadedTask[] = await response.json();
+      const fetchedTasks: Task[] = data.map((task: PreviousLoadedTask) => ({
         id: task.id,
         tasks: task.title,
         completed: false,
@@ -39,13 +42,11 @@ const LoadTask: React.FC<Props> = ({ handleFetchedTasks }) => {
       <button
         onClick={fetchTasks}
         disabled={loading || loaded}
-        className={`px-4 py-2 rounded-md ${
-          loading || loaded
-            ? "bg-gray-300 cursor-not-allowed"
-            : "bg-blue-400 text-white hover:bg-blue-600 transition duration-200"
+        className={`w-full bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition duration-200 ${
+          loading || loaded ? "bg-gray-300 cursor-not-allowed" : ""
         }`}
       >
-        {loading ? "Loading tasks..." : "Load previous tasks"}
+        {loading ? "Loading tasks..." : "Load previous tasks ..."}
       </button>
       {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>

@@ -9,7 +9,7 @@ interface Props {
 
 const TaskList: React.FC<Props> = ({ taskInput, setTaskInput }) => {
   return (
-    <div className="mt-4">
+    <div className="mt-4 space-y-2">
       {taskInput.map((tasks) => (
         <SingleTask
           tasks={tasks}
